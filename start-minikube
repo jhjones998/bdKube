@@ -1,2 +1,10 @@
 minikube start --extra-config "apiserver.cors-allowed-origins=["http://boot.dev"]"
-minikube dashboard --port=63840
+minikube dashboard --port=63840 &
+pid[0]=$!
+kubectl proxy &
+pid[1]=$!
+minikube tunnel -c &
+pid[2]=$!
+trap "pkill -P ${pid[0]}; pkill -P ${pid[1]}; pkill -P ${pid[2]}; exit 0" INT
+
+wait
